@@ -1,784 +1,428 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANIME FLIX - YouTube Style Streaming</title>
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --bg-dark: #0d0f12;
-            --bg-sidebar: #13151b;
-            --bg-card: #181b22;
-            --bg-input: #1f232d;
-            --primary-red: #e50914;
-            --primary-green: #10b981;
-            --text-main: #ffffff;
-            --text-muted: #8e95a5;
-            --border-color: rgba(255, 255, 255, 0.06);
-            --radius-lg: 16px;
-            --radius-md: 10px;
-            --radius-sm: 6px;
+    <meta name="theme-color" content="#101014">
+    <title>NekoStream - Anime & Film</title><style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #101014;
+        color: #f5f5f5;
+        font-family: Arial, sans-serif;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 6%;
+        background: #18181f;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid #292933;
+    }
+
+    .logo {
+        color: #ff426d;
+        font-size: 23px;
+        font-weight: bold;
+    }
+
+    .logo span {
+        color: white;
+    }
+
+    .search {
+        width: 48%;
+        max-width: 350px;
+        padding: 11px;
+        background: #292933;
+        color: white;
+        border: 1px solid #3a3a46;
+        border-radius: 8px;
+        outline: none;
+    }
+
+    .hero {
+        padding: 45px 6%;
+        background: linear-gradient(110deg, #30203e, #111116 80%);
+    }
+
+    .hero small {
+        color: #ff7896;
+        font-weight: bold;
+    }
+
+    .hero h1 {
+        font-size: clamp(28px, 6vw, 48px);
+        margin: 15px 0;
+    }
+
+    .hero p {
+        color: #c4c4cf;
+        line-height: 1.7;
+        max-width: 500px;
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        border-radius: 7px;
+        padding: 12px 18px;
+        font-weight: bold;
+    }
+
+    .primary {
+        background: #ff426d;
+        color: white;
+        margin-top: 20px;
+    }
+
+    main {
+        padding: 30px 6%;
+    }
+
+    .section-title {
+        margin-bottom: 20px;
+        font-size: 22px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .card {
+        background: #1c1c24;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #292933;
+    }
+
+    .poster {
+        height: 170px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(140deg, #57304f, #202039);
+        font-size: 45px;
+    }
+
+    .card-info {
+        padding: 13px;
+    }
+
+    .card h3 {
+        font-size: 15px;
+        margin-bottom: 7px;
+    }
+
+    .card p {
+        color: #a6a6b5;
+        font-size: 12px;
+    }
+
+    .watch-button {
+        width: 100%;
+        margin-top: 12px;
+        background: #30303c;
+        color: white;
+    }
+
+    .watch-button:hover {
+        background: #ff426d;
+    }
+
+    .player-section {
+        display: none;
+        padding: 25px 6%;
+        background: #191920;
+    }
+
+    .player-section.active {
+        display: block;
+    }
+
+    video {
+        width: 100%;
+        max-height: 65vh;
+        background: black;
+        border-radius: 10px;
+    }
+
+    .player-title {
+        margin: 18px 0 12px;
+    }
+
+    .quality-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin: 15px 0;
+    }
+
+    select {
+        padding: 10px;
+        background: #30303c;
+        color: white;
+        border: 1px solid #484855;
+        border-radius: 7px;
+    }
+
+    .notice {
+        color: #b5b5c3;
+        font-size: 13px;
+        line-height: 1.7;
+        margin-top: 12px;
+    }
+
+    footer {
+        text-align: center;
+        color: #888896;
+        padding: 25px 10px;
+        border-top: 1px solid #292933;
+        font-size: 13px;
+    }
+
+    @media (min-width: 650px) {
+        .grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        .poster {
+            height: 220px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        header {
+            padding: 15px 4%;
+            gap: 10px;
         }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
+        .logo {
+            font-size: 19px;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            background-color: var(--bg-sidebar);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
+        .search {
+            width: 55%;
+            min-width: 0;
         }
-
-        .brand-title {
-            color: var(--primary-red);
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .nav-menu {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex-grow: 1;
-        }
-
-        .nav-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s ease;
-            text-align: left;
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background-color: var(--primary-red);
-            color: var(--text-main);
-        }
-
-        .btn-add-content {
-            width: 100%;
-            background: transparent;
-            border: 2px dashed var(--primary-red);
-            color: var(--text-main);
-            padding: 12px;
-            border-radius: var(--radius-md);
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
-        }
-
-        .btn-add-content:hover { background: var(--primary-red); }
-
-        /* Main Content Wrapper */
-        .main-wrapper {
-            margin-left: 260px;
-            flex-grow: 1;
-            padding: 24px 36px;
-            width: calc(100% - 260px);
-        }
-
-        /* Header */
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-        }
-
-        .search-bar {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 10px 18px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 360px;
-            color: var(--text-muted);
-        }
-
-        .search-bar input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: white;
-            width: 100%;
-        }
-
-        .user-pill {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .badge-premium {
-            background: linear-gradient(135deg, #f5af19, #f12711);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .user-avatar img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--bg-card);
-        }
-
-        /* Pages Navigation */
-        .page-content { display: none; }
-        .page-content.active { display: block; }
-
-        /* Dashboard Components */
-        .section-block { margin-bottom: 32px; }
-        .section-label { font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; }
-
-        .carousel-container {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-
-        .anime-card {
-            min-width: 210px;
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: 0.2s ease;
-        }
-
-        .anime-card:hover { transform: translateY(-5px); border-color: var(--primary-red); }
-
-        .card-media {
-            height: 120px;
-            background: #252934;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .play-overlay {
-            width: 40px; height: 40px;
-            background: rgba(0,0,0,0.6);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--primary-red);
-        }
-
-        .card-details { padding: 14px; }
-        .card-details h4 { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 6px; }
-        .btn-play-tag { font-size: 0.75rem; color: var(--primary-red); font-weight: 700; }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 16px;
-        }
-
-        /* Player Box & Touch Gestures */
-        .btn-back {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 10px 18px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .player-box {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            background: #000;
-            overflow: hidden;
-        }
-
-        .video-container video {
-            width: 100%;
-            height: auto;
-            max-height: 70vh;
-            display: block;
-        }
-
-        .gesture-layer {
-            position: absolute;
-            top: 0; bottom: 50px;
-            width: 35%;
-            z-index: 10;
-            display: flex; align-items: center; justify-content: center;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        .gesture-layer.left { left: 0; }
-        .gesture-layer.right { right: 0; }
-
-        .gesture-anim {
-            background: rgba(229, 9, 20, 0.85);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 800;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: opacity 0.25s, transform 0.25s;
-            pointer-events: none;
-        }
-
-        .gesture-anim.show { opacity: 1; transform: scale(1); }
-
-        .speed-badge {
-            position: absolute;
-            top: 15px; right: 15px;
-            background: rgba(229, 9, 20, 0.95);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 800;
-            z-index: 20;
-            display: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-
-        /* Player Meta Bar */
-        .player-meta-bar {
-            padding: 20px 24px;
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .title-meta h2 { font-size: 1.2rem; }
-        .title-meta p { color: var(--text-muted); font-size: 0.85rem; }
-
-        .meta-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-        .pill-btn {
-            background: var(--bg-input);
-            border: none; color: var(--text-main);
-            padding: 10px 16px; border-radius: var(--radius-md);
-            font-size: 0.85rem; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .btn-success { background-color: var(--primary-green); }
-
-        /* Dropdown Menu Style YouTube */
-        .dropdown-wrapper { position: relative; }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            bottom: 110%; right: 0;
-            background: #232733;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            width: 220px;
-            box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
-            z-index: 999;
-            overflow: hidden;
-        }
-
-        .dropdown-menu.show { display: block; }
-
-        .dropdown-header {
-            padding: 10px 14px;
-            font-size: 0.75rem; color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 700;
-        }
-
-        .dropdown-item {
-            padding: 10px 14px;
-            font-size: 0.85rem; cursor: pointer;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .dropdown-item:hover, .dropdown-item.active { background: var(--primary-red); }
-
-        /* Comments Section */
-        .comments-card { padding: 24px; }
-        .comment-input { display: flex; gap: 10px; margin: 16px 0; }
-        .comment-input input {
-            flex-grow: 1; background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            padding: 10px 16px; border-radius: var(--radius-md); color: white;
-        }
-        .comment-input button {
-            background: var(--primary-red); border: none; color: white;
-            padding: 0 18px; border-radius: var(--radius-md); cursor: pointer;
-        }
-
-        .comment-item { display: flex; gap: 12px; margin-bottom: 12px; }
-        .user-avatar-sm {
-            width: 36px; height: 36px; background: #333; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-weight: 700;
-        }
-
-        /* Panels & Modals */
-        .panel-card {
-            background: var(--bg-card); border-radius: var(--radius-lg);
-            padding: 28px; border: 1px solid var(--border-color);
-        }
-
-        .modal-backdrop {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.8);
-            z-index: 200; justify-content: center; align-items: center;
-        }
-
-        .modal-card {
-            background: var(--bg-card); padding: 28px;
-            border-radius: var(--radius-lg); width: 100%; max-width: 440px;
-            border: 1px solid var(--border-color);
-        }
-
-        .modal-head { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .btn-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
-        .form-group input, .form-select {
-            width: 100%; padding: 10px 14px; background: var(--bg-input);
-            border: 1px solid var(--border-color); border-radius: var(--radius-md); color: white;
-        }
-
-        .btn-submit {
-            width: 100%; background: var(--primary-red); color: white;
-            border: none; padding: 12px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-wrapper { margin-left: 0; width: 100%; padding: 16px; }
-            .search-bar { width: 180px; }
-            .dropdown-menu { right: auto; left: 0; }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Sidebar Navigasi -->
-    <aside class="sidebar">
-        <div class="brand"><span class="brand-title">ANIME FLIX</span></div>
-        <nav class="nav-menu">
-            <button class="nav-btn active" onclick="switchPage('dashboard')"><i class="fa-solid fa-house"></i> <span>Home Dashboard</span></button>
-            <button class="nav-btn" onclick="switchPage('profile')"><i class="fa-solid fa-user"></i> <span>User Profile</span></button>
-            <button class="nav-btn" onclick="switchPage('downloads')"><i class="fa-solid fa-download"></i> <span>Downloads</span></button>
-            <button class="nav-btn" onclick="switchPage('explore')"><i class="fa-solid fa-sliders"></i> <span>Filters & Search</span></button>
-        </nav>
-        <div class="sidebar-footer">
-            <button class="btn-add-content" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> <span>Tambah Video</span></button>
-        </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="main-wrapper">
-        <header class="top-header">
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search Anime, Genres, Studios...">
-            </div>
-            <div class="user-pill">
-                <span class="badge-premium">Go Premium</span>
-                <div class="user-avatar"><img src="https://api.dicebear.com/6.x/bottts/svg?seed=Kai" alt="Avatar"></div>
-            </div>
-        </header>
-
-        <!-- PAGE 1: DASHBOARD -->
-        <section id="page-dashboard" class="page-content active">
-            <div class="section-block">
-                <h2 class="section-label">Watch Now</h2>
-                <div class="carousel-container" id="watchNowList">
-                    <div class="anime-card" onclick="openWatchPage('Saijaku Tamer - Eps01', 'https://cdn-stable.nanimeid.xyz/file/NanimeID-V2/Upload-Xyann/Saijaku-Tamer/Eps01-720.mp4', '720p')">
-                        <div class="card-media"><div class="play-overlay"><i class="fa-solid fa-play"></i></div></div>
-                        <div class="card-details">
-                            <h4>Saijaku Tamer - Episode 01</h4>
-                            <span class="btn-play-tag"><i class="fa-solid fa-play"></i> PLAY (720p Direct)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="section-block">
-                <h2 class="section-label">Recently Added</h2>
-                <div class="grid-container" id="recentGrid"></div>
-            </div>
-        </section>
-
-        <!-- PAGE 2: PLAYER / NONTON -->
-        <section id="page-watch" class="page-content">
-            <button class="btn-back" onclick="switchPage('dashboard')"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</button>
-            <div class="watch-layout">
-                <div class="player-box">
-                    <div class="video-container" id="videoContainer">
-                        <video id="nativePlayer" controls playsinline preload="metadata">
-                            <source id="videoSource" src="" type="video/mp4">
-                        </video>
-                        <div class="gesture-layer left" id="zoneLeft"><div class="gesture-anim" id="animLeft"><i class="fa-solid fa-rotate-left"></i> -10s</div></div>
-                        <div class="gesture-layer right" id="zoneRight"><div class="gesture-anim" id="animRight"><i class="fa-solid fa-rotate-right"></i> +10s</div></div>
-                        <div class="speed-badge" id="speedBadge"><i class="fa-solid fa-bolt"></i> 2X SPEED</div>
-                    </div>
-
-                    <div class="player-meta-bar">
-                        <div class="title-meta">
-                            <h2 id="activeVideoTitle">Judul Video</h2>
-                            <p>Subtitles: Indonesian, English, Japanese</p>
-                        </div>
-                        <div class="meta-actions">
-                            <button class="pill-btn" id="likeBtn" onclick="toggleLike()"><i class="fa-regular fa-heart"></i> <span id="likeCount">2.4k</span> Likes</button>
-                            <button class="pill-btn"><i class="fa-regular fa-comment"></i> 587 Comments</button>
-                            
-                            <!-- Download Dropdown -->
-                            <div class="dropdown-wrapper">
-                                <button class="pill-btn btn-success" onclick="toggleDropdown('dlDropdown')"><i class="fa-solid fa-download"></i> Download <i class="fa-solid fa-chevron-down"></i></button>
-                                <div class="dropdown-menu" id="dlDropdown">
-                                    <div class="dropdown-header">Pilih Resolusi Download</div>
-                                    <div id="downloadResList"></div>
-                                </div>
-                            </div>
-
-                            <!-- YouTube Style Resolution Dropdown Aktif -->
-                            <div class="dropdown-wrapper">
-                                <button class="pill-btn" onclick="toggleDropdown('resDropdown')"><i class="fa-solid fa-gear"></i> <span id="currentResLabel">720p</span> <i class="fa-solid fa-chevron-down"></i></button>
-                                <div class="dropdown-menu" id="resDropdown">
-                                    <div class="dropdown-header">Kualitas Video (YouTube Style)</div>
-                                    <div id="playerResList"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="comments-card">
-                        <h3>Comments & Community Feed</h3>
-                        <div class="comment-input">
-                            <input type="text" id="commentText" placeholder="Add a comment...">
-                            <button onclick="addComment()"><i class="fa-solid fa-paper-plane"></i></button>
-                        </div>
-                        <div class="comments-list" id="commentsList">
-                            <div class="comment-item">
-                                <div class="user-avatar-sm">N</div>
-                                <div class="comment-body"><strong>Nail</strong> <small>1m ago</small><p>Episode paling mantap minggu ini!</p></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PAGE 3: DOWNLOADS -->
-        <section id="page-downloads" class="page-content">
-            <div class="panel-card">
-                <h2>Downloads & Offline Viewing</h2>
-                <p style="color:var(--text-muted); margin-top:10px;">Semua file video dapat diunduh langsung via direct link kualitas penuh.</p>
-            </div>
-        </section>
-
-        <!-- PAGE 4: PROFILE -->
-        <section id="page-profile" class="page-content">
-            <div class="panel-card">
-                <h2>User Profile & Membership</h2>
-                <p style="color:var(--text-muted); margin-top:10px;">Status: Premium Member</p>
-            </div>
-        </section>
-
-        <!-- PAGE 5: EXPLORE -->
-        <section id="page-explore" class="page-content">
-            <div class="panel-card">
-                <h2>Search & Advanced Filters</h2>
-                <p style="color:var(--text-muted); margin-top:10px;">Fitur filter genre aktif.</p>
-            </div>
-        </section>
-    </main>
-
-    <!-- Modal Tambah Video -->
-    <div class="modal-backdrop" id="addModal">
-        <div class="modal-card">
-            <div class="modal-head">
-                <h3>Tambah Episode Baru</h3>
-                <button class="btn-close" onclick="closeAddModal()">&times;</button>
-            </div>
-            <form id="addVideoForm" onsubmit="handleNewVideo(event)">
-                <div class="form-group"><label>Judul Anime</label><input type="text" id="inputTitle" placeholder="Contoh: Saijaku Eps02" required></div>
-                <div class="form-group"><label>Direct Link (.mp4)</label><input type="url" id="inputEmbed" placeholder="https://..." required></div>
-                <div class="form-group">
-                    <label>Resolusi Asli Video</label>
-                    <select id="inputMaxRes" class="form-select">
-                        <option value="1080p">1080p</option>
-                        <option value="720p" selected>720p</option>
-                        <option value="480p">480p</option>
-                        <option value="360p">360p</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-submit">Simpan & Putar</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- JavaScript Logika Resolusi YouTube Style & Gesture -->
-    <script>
-        let activeMaxRes = '720p';
-        let currentBaseUrl = '';
-        let currentRes = '720p';
-        let isLiked = false;
-
-        function switchPage(pageId) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function openWatchPage(title, videoUrl, maxRes) {
-            activeMaxRes = maxRes || '720p';
-            currentRes = activeMaxRes;
-            
-            // Ekstrak pola URL untuk mengganti resolusi secara dinamis ala YouTube (misal: Eps01-720.mp4 -> Eps01-)
-            currentBaseUrl = videoUrl.replace(/(360|480|720|1080)(\.mp4)$/, '');
-
-            const video = document.getElementById('nativePlayer');
-            const source = document.getElementById('videoSource');
-
-            source.src = videoUrl;
-            video.load();
-            document.getElementById('activeVideoTitle').innerText = title;
-            document.getElementById('currentResLabel').innerText = currentRes;
-
-            generateResolutionOptions();
-            switchPage('watch');
-        }
-
-        // FUNGSI GANTI RESOLUSI YOUTUBE STYLE (Mengganti source file & mempertahankan detik pemutaran)
-        function changeYouTubeResolution(targetRes) {
-            const video = document.getElementById('nativePlayer');
-            const source = document.getElementById('videoSource');
-            
-            const currentTime = video.currentTime; // Simpan posisi detik video saat ini
-            const isPlaying = !video.paused;
-
-            // Buat URL baru sesuai pilihan resolusi
-            const newUrl = `${currentBaseUrl}${targetRes}.mp4`;
-            currentRes = targetRes;
-            document.getElementById('currentResLabel').innerText = currentRes;
-
-            source.src = newUrl;
-            video.load();
-            video.currentTime = currentTime; // Lanjutkan pemutaran dari detik yang sama
-
-            // Jika server tidak memiliki file resolusi tersebut, fallback otomatis ke link awal
-            video.onerror = () => {
-                console.warn(`File resolusi ${targetRes} tidak ditemukan di server, kembali ke resolusi asli.`);
-                source.src = `${currentBaseUrl}${activeMaxRes}.mp4`;
-                video.load();
-                video.currentTime = currentTime;
-                if (isPlaying) video.play();
-                alert(`Kualitas ${targetRes} tidak tersedia di server. Memutar kualitas otomatis.`);
-            };
-
-            if (isPlaying) {
-                video.play();
+    }
+</style>
+
+</head><body><header>
+    <div class="logo">Neko<span>Stream</span></div><input
+    type="search"
+    class="search"
+    id="search"
+    placeholder="Cari anime..."
+    aria-label="Cari anime"
+>
+
+</header><section class="hero">
+    <small>SELAMAT DATANG DI NEKOSTREAM</small>
+    <h1>Anime favoritmu,<br>di satu tempat.</h1>
+    <p>
+        Temukan anime favoritmu dan nikmati pengalaman
+        menonton dengan tampilan modern.
+    </p><button class="primary" onclick="openPlayer()">
+    ▶ Mulai Menonton
+</button>
+
+</section><section class="player-section" id="playerSection">
+    <h2 class="player-title" id="playerTitle">Pemutar Video</h2><video id="videoPlayer" controls playsinline preload="metadata">
+    Browser kamu tidak mendukung pemutar video.
+</video>
+
+<div class="quality-row">
+    <label for="quality">Resolusi:</label>
+
+    <select id="quality" onchange="changeQuality()">
+        <option value="1080">1080p</option>
+    </select>
+</div>
+
+<p class="notice" id="playerNotice">
+    Pilihan resolusi akan tersedia setelah sumber video
+    untuk masing-masing kualitas ditambahkan.
+</p>
+
+</section><main>
+    <h2 class="section-title">🔥 Anime Pilihan</h2><div class="grid" id="animeGrid"></div>
+
+</main><footer>
+    NekoStream © 2026 · Gunakan layanan ini untuk konten
+    yang kamu miliki atau berhak distribusikan.
+</footer><script>
+    // Ganti atau tambahkan data anime di bagian ini.
+    const animeList = [
+        {
+            title: "Dragon Ball Super: Beerus",
+            episode: "Episode 1",
+            emoji: "🐉",
+            qualities: {
+                "1080": "https://cdn-stable.nanimeid.xyz/file/NanimeID-V2/Denz/anime%20ongoing%202/Dragon%20Ball%20Super%20Beerus/01/Beerus%201%20FullHD-WINBU.ORG.mp4"
             }
-
-            generateResolutionOptions();
-            toggleDropdown('resDropdown');
+        },
+        {
+            title: "Anime Favorit 2",
+            episode: "Episode 1",
+            emoji: "🌸",
+            qualities: {}
+        },
+        {
+            title: "Anime Favorit 3",
+            episode: "Episode 1",
+            emoji: "⚔️",
+            qualities: {}
+        },
+        {
+            title: "Anime Favorit 4",
+            episode: "Episode 1",
+            emoji: "🌌",
+            qualities: {}
         }
+    ];
 
-        function generateResolutionOptions() {
-            const resLevels = ['1080p', '720p', '480p', '360p', '240p'];
-            let startIndex = resLevels.indexOf(activeMaxRes);
-            if (startIndex === -1) startIndex = 1;
-            
-            const availableRes = resLevels.slice(startIndex);
-            const playerList = document.getElementById('playerResList');
-            const downloadList = document.getElementById('downloadResList');
+    const grid = document.getElementById("animeGrid");
+    const player = document.getElementById("videoPlayer");
+    const qualitySelect = document.getElementById("quality");
+    const playerSection = document.getElementById("playerSection");
 
-            playerList.innerHTML = '';
-            downloadList.innerHTML = '';
+    let currentAnime = null;
+    let currentQuality = "1080";
 
-            availableRes.forEach(res => {
-                // Tombol Pilihan Resolusi (YouTube Style)
-                const resItem = document.createElement('div');
-                resItem.className = `dropdown-item ${res === currentRes ? 'active' : ''}`;
-                resItem.innerHTML = `<span>${res}</span> ${res === currentRes ? '<i class="fa-solid fa-check" style="color:#10b981;"></i>' : ''}`;
-                resItem.onclick = (e) => {
-                    e.stopPropagation();
-                    changeYouTubeResolution(res);
-                    toggleDropdown('resDropdown');
-                };
-                playerList.appendChild(resItem);
+    function renderAnime(items) {
+        grid.innerHTML = "";
 
-                // Tombol Download
-                const dlItem = document.createElement('div');
-                dlItem.className = 'dropdown-item';
-                dlItem.innerText = `Download (${res})`;
-                dlItem.onclick = (e) => {
-                    e.stopPropagation();
-                    const dlUrl = `${currentBaseUrl}${res}.mp4`;
-                    window.open(dlUrl, '_blank');
-                    toggleDropdown('dlDropdown');
-                };
-                downloadList.appendChild(dlItem);
-            });
-        }
+        items.forEach(anime => {
+            const card = document.createElement("article");
+            card.className = "card";
 
-        function toggleDropdown(id) {
-            const el = document.getElementById(id);
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                if (menu !== el) menu.classList.remove('show');
-            });
-            el.classList.toggle('show');
-        }
+            const poster = document.createElement("div");
+            poster.className = "poster";
+            poster.textContent = anime.emoji;
 
-        window.onclick = function(event) {
-            if (!event.target.closest('.dropdown-wrapper')) {
-                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
-            }
-        }
+            const info = document.createElement("div");
+            info.className = "card-info";
 
-        function toggleLike() {
-            isLiked = !isLiked;
-            const btn = document.getElementById('likeBtn');
-            btn.style.color = isLiked ? '#e50914' : 'white';
-            document.getElementById('likeCount').innerText = isLiked ? '2,4k+1' : '2.4k';
-        }
+            const title = document.createElement("h3");
+            title.textContent = anime.title;
 
-        function addComment() {
-            const text = document.getElementById('commentText').value;
-            if (!text) return;
-            const list = document.getElementById('commentsList');
-            const item = document.createElement('div');
-            item.className = 'comment-item';
-            item.innerHTML = `<div class="user-avatar-sm">K</div><div class="comment-body"><strong>Kai</strong> <small>Baru saja</small><p>${text}</p></div>`;
-            list.prepend(item);
-            document.getElementById('commentText').value = '';
-        }
+            const episode = document.createElement("p");
+            episode.textContent = anime.episode;
 
-        // Gesture Touch Controller (Double Tap & Hold 2x Speed)
-        document.addEventListener('DOMContentLoaded', () => {
-            const video = document.getElementById('nativePlayer');
-            const zoneLeft = document.getElementById('zoneLeft');
-            const zoneRight = document.getElementById('zoneRight');
-            const animLeft = document.getElementById('animLeft');
-            const animRight = document.getElementById('animRight');
-            const speedBadge = document.getElementById('speedBadge');
+            const button = document.createElement("button");
+            button.className = "watch-button";
+            button.textContent = "▶ Tonton";
 
-            let lastTapLeft = 0;
-            let lastTapRight = 0;
-            let holdTimer = null;
-
-            if (!video) return;
-
-            zoneLeft.addEventListener('click', () => {
-                const now = Date.now();
-                if (now - lastTapLeft < 350) {
-                    video.currentTime = Math.max(0, video.currentTime - 10);
-                    animLeft.classList.add('show');
-                    setTimeout(() => animLeft.classList.remove('show'), 600);
-                }
-                lastTapLeft = now;
+            button.addEventListener("click", () => {
+                openPlayer(anime);
             });
 
-            zoneRight.addEventListener('click', () => {
-                const now = Date.now();
-                if (now - lastTapRight < 350) {
-                    video.currentTime = Math.min(video.duration, video.currentTime + 10);
-                    animRight.classList.add('show');
-                    setTimeout(() => animRight.classList.remove('show'), 600);
-                }
-                lastTapRight = now;
-            });
-
-            function startHold() {
-                holdTimer = setTimeout(() => {
-                    video.playbackRate = 2.0;
-                    speedBadge.style.display = 'block';
-                }, 350);
-            }
-
-            function stopHold() {
-                if (holdTimer) clearTimeout(holdTimer);
-                video.playbackRate = 1.0;
-                speedBadge.style.display = 'none';
-            }
-
-            [zoneLeft, zoneRight].forEach(z => {
-                z.addEventListener('touchstart', startHold);
-                z.addEventListener('touchend', stopHold);
-                z.addEventListener('mousedown', startHold);
-                z.addEventListener('mouseup', stopHold);
-            });
-        });
-
-        function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-        function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
-
-        function handleNewVideo(e) {
-            e.preventDefault();
-            const title = document.getElementById('inputTitle').value;
-            const embed = document.getElementById('inputEmbed').value;
-            const maxRes = document.getElementById('inputMaxRes').value;
-
-            const grid = document.getElementById('recentGrid');
-            const card = document.createElement('div');
-            card.className = 'anime-card';
-            card.onclick = () => openWatchPage(title, embed, maxRes);
-            card.innerHTML = `<div class="card-media"><div class="play-overlay"><i class="fa-solid fa-play"></i></div></div><div class="card-details"><h4>${title}</h4><span class="btn-play-tag"><i class="fa-solid fa-play"></i> PLAY (${maxRes})</span></div>`;
-
+            info.append(title, episode, button);
+            card.append(poster, info);
             grid.appendChild(card);
-            closeAddModal();
-            openWatchPage(title, embed, maxRes);
+        });
+    }
+
+    function openPlayer(anime = animeList[0]) {
+        currentAnime = anime;
+
+        playerSection.classList.add("active");
+        document.getElementById("playerTitle").textContent =
+            anime.title + " - " + anime.episode;
+
+        qualitySelect.innerHTML = "";
+
+        const availableQualities = Object.keys(anime.qualities)
+            .filter(q => anime.qualities[q]);
+
+        if (availableQualities.length === 0) {
+            player.pause();
+            player.removeAttribute("src");
+            player.load();
+
+            qualitySelect.disabled = true;
+
+            document.getElementById("playerNotice").textContent =
+                "Belum ada sumber video untuk judul ini.";
+
+        } else {
+            qualitySelect.disabled = false;
+
+            availableQualities.sort((a, b) => Number(b) - Number(a));
+
+            availableQualities.forEach(q => {
+                const option = document.createElement("option");
+                option.value = q;
+                option.textContent = q + "p";
+                qualitySelect.appendChild(option);
+            });
+
+            currentQuality = availableQualities[0];
+            qualitySelect.value = currentQuality;
+
+            changeQuality();
+
+            document.getElementById("playerNotice").textContent =
+                "Pilih kualitas yang tersedia. Kualitas video bergantung pada sumber.";
         }
-    </script>
-</body>
+
+        playerSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+
+    function changeQuality() {
+        if (!currentAnime) return;
+
+        const selected = qualitySelect.value;
+        const url = currentAnime.qualities[selected];
+
+        if (!url) return;
+
+        const previousTime = player.currentTime || 0;
+        const wasPlaying = !player.paused;
+
+        currentQuality = selected;
+
+        player.src = url;
+        player.load();
+
+        player.addEventListener("loadedmetadata", function restorePosition() {
+            player.removeEventListener("loadedmetadata", restorePosition);
+
+            if (previousTime < player.duration) {
+                player.currentTime = previousTime;
+            }
+
+            if (wasPlaying) {
+                player.play().catch(() => {});
+            }
+        });
+    }
+
+    document.getElementById("search").addEventListener("input", function() {
+        const query = this.value.toLowerCase();
+
+        renderAnime(
+            animeList.filter(anime =>
+                anime.title.toLowerCase().includes(query)
+            )
+        );
+    });
+
+    renderAnime(animeList);
+</script></body>
 </html>
