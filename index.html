@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Player Anime / Film Custom</title>
+
+  <!-- Plyr CSS & HLS.js Library -->
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background-color: #0b0f19;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+    h2 {
+      text-align: center;
+      margin: 15px 0;
+      color: #38bdf8;
+    }
+
+    /* Container Player Utama */
+    .player-container {
+      position: relative;
+      width: 100%;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* Area Kiri & Kanan untuk Touch Gesture */
+    .gesture-area {
+      position: absolute;
+      top: 0;
+      bottom: 60px; /* Supaya tidak menutupi bar durasi/tombol di bawah */
+      width: 45%;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .area-left { left: 0; }
+    .area-right { right: 0; }
+
+    /* Indikator Animasi (+10s / 2x Speed) */
+    .indicator {
+      background: rgba(0, 0, 0, 0.8);
+      color: #38bdf8;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .indicator.show {
+      opacity: 1;
+    }
+
+    /* Section Input Link */
+    .input-box {
+      background: #1e293b;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    @media (min-width: 480px) {
+      .input-group { flex-direction: row; }
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #fff;
+    }
+    button {
+      padding: 10px 18px;
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Web Player Nonton Anime</h2>
+
+  <!-- VIDEO PLAYER CONTAINER -->
+  <div class="player-container">
+    <video id="video" crossorigin playsinline controls></video>
+
+    <!-- Area Touch Kiri (Mundur 10s & Hold Speed) -->
+    <div class="gesture-area area-left" id="touch-left">
+      <div class="indicator" id="ind-left">◀◀ 10s</div>
+    </div>
+
+    <!-- Area Touch Kanan (Maju 10s & Hold Speed 2x) -->
+    <div class="gesture-area area-right" id="touch-right">
+      <div class="indicator" id="ind-right">▶▶ 10s</div>
+    </div>
+  </div>
+
+  <!-- INPUT AREA -->
+  <div class="input-box">
+    <h3>Tambah Link / Embed Video</h3>
+    <div class="input-group">
+      <input type="text" id="video-input" placeholder="Masukkan Link Byse / MP4 / HLS (.m3u8)">
+      <button onclick="playNewVideo()">Putar Film</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const video = document.getElementById('video');
+  const touchLeft = document.getElementById('touch-left');
+  const touchRight = document.getElementById('touch-right');
+  const indLeft = document.getElementById('ind-left');
+  const indRight = document.getElementById('ind-right');
+  
+  let plyrPlayer;
+  let hls;
+
+  // 1. Inisialisasi Player Plyr
+  plyrPlayer = new Plyr(video, {
+    controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
+    settings: ['quality', 'speed'],
+    speed: { selected: 1, options: [0.5, 1, 1.25, 1.5, 2] }
+  });
+
+  // 2. FITUR FITUR YANG ANDA MINTA:
+  // A. Double Click/Tap (Maju/Mundur 10 Detik)
+  // B. Hold / Tekan Tahan Kiri/Kanan (Percepat 2x)
+  function attachGestures(element, isRight) {
+    let lastTap = 0;
+    let holdTimer = null;
+    let isHolding = false;
+
+    const start = (e) => {
+      const now = Date.now();
+      const diff = now - lastTap;
+
+      // Fitur Double Click / Double Tap 10s
+      if (diff < 300 && diff > 0) {
+        clearTimeout(holdTimer);
+        if (isRight) {
+          plyrPlayer.forward(10);
+          showPopup(indRight, "▶▶ +10s");
+        } else {
+          plyrPlayer.rewind(10);
+          showPopup(indLeft, "◀◀ -10s");
+        }
+      }
+
+      // Fitur Tahan/Hold Layar Kanan/Kiri (Speed 2x)
+      holdTimer = setTimeout(() => {
+        isHolding = true;
+        plyrPlayer.speed = 2; // Paksa Kecepatan ke 2x
+        const ind = isRight ? indRight : indLeft;
+        showPopup(ind, "⚡ 2x Speed", true);
+      }, 400);
+
+      lastTap = now;
+    };
+
+    const end = () => {
+      clearTimeout(holdTimer);
+      if (isHolding) {
+        isHolding = false;
+        plyrPlayer.speed = 1; // Kembalikan ke Speed Normal
+        indLeft.classList.remove('show');
+        indRight.classList.remove('show');
+      }
+    };
+
+    element.addEventListener('touchstart', start);
+    element.addEventListener('touchend', end);
+    element.addEventListener('mousedown', start);
+    element.addEventListener('mouseup', end);
+  }
+
+  attachGestures(touchLeft, false);
+  attachGestures(touchRight, true);
+
+  function showPopup(el, text, keepOpen = false) {
+    el.innerText = text;
+    el.classList.add('show');
+    if (!keepOpen) {
+      setTimeout(() => el.classList.remove('show'), 700);
+    }
+  }
+
+  // 3. FITUR LOAD VIDEO DENGAN PILIHAN RESOLUSI MULTI-QUALITY
+  function loadStream(url) {
+    if (hls) hls.destroy();
+
+    if (Hls.isSupported()) {
+      hls = new Hls();
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      
+      // Mengambil pilihan resolusi otomatis (480p, 720p, 1080p dll) jika file memiliki multi-resolution
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        const availableQualities = hls.levels.map((l) => l.height);
+        
+        plyrPlayer.config.quality = {
+          default: availableQualities[0],
+          options: availableQualities,
+          forced: true,
+          onChange: (newQuality) => {
+            hls.levels.forEach((level, levelIndex) => {
+              if (level.height === newQuality) {
+                hls.currentLevel = levelIndex;
+              }
+            });
+          }
+        };
+      });
+    } else {
+      video.src = url;
+    }
+  }
+
+  function playNewVideo() {
+    let input = document.getElementById('video-input').value.trim();
+    if (!input) return alert("Masukkan link video dulu!");
+
+    // Jika memasukkan link embed Byse, diubah otomatis menjadi direct video
+    if (input.includes('bysewihe.com') || input.includes('byse.sx')) {
+      // Trik bypass Byse
+      let id = input.split('/e/')[1] || input.split('/')[4];
+      if (id) {
+        input = `https://bysewihe.com/hls/${id}/index.m3u8`;
+      }
+    }
+
+    loadStream(input);
+    plyrPlayer.play();
+  }
+
+  // Auto load video contoh pertama milik Anda
+  document.getElementById('video-input').value = "https://bysewihe.com/e/8iyzjoc4wa1m/eps01-720";
+  playNewVideo();
+</script>
+
+</body>
+</html>
